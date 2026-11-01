@@ -24,7 +24,7 @@ interface ExpressShipmentFormProps {
 }
 
 const panelClass =
-  'rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs dark:border-white/10 dark:bg-slate-950/60'
+  'rounded-xl border border-slate-200 bg-card p-2.5 shadow-xs dark:border-white/10'
 
 export function ExpressShipmentForm(props: ExpressShipmentFormProps) {
   const cargoNeedsReview = props.form.cargoType !== 'general'

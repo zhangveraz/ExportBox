@@ -7,7 +7,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { ToolShell, TOOL_RESULT_COLUMN } from '@/components/tools/tool-shell'
+import { ToolShell } from '@/components/tools/tool-shell'
 import { EnhancedAlert } from '@/components/ui/enhanced-alert'
 import {
   DEFAULT_CARGO_INSURANCE_INPUTS,
@@ -17,7 +17,7 @@ import {
   type InsurancePresetId,
 } from '@/lib/tools/cargo-insurance-calculator'
 import { CargoInsuranceForm, type InsuranceFormState, type InsuranceNumericField } from './cargo-insurance-form'
-import { CargoInsuranceResult } from './cargo-insurance-result'
+import { CargoInsuranceResult, CargoInsuranceStats } from './cargo-insurance-result'
 
 function createInitialForm(): InsuranceFormState {
   return {
@@ -92,7 +92,9 @@ export default function CargoInsuranceCalculatorPage() {
 
       {calculation.error && <EnhancedAlert type="error" title="计算错误" message={calculation.error} action={{ label: '重置', onClick: () => setForm(createInitialForm()) }} className="mb-2.5" />}
 
-      <div className="grid items-start gap-3 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+      {/* 顶部四格概览 + 左侧录参 / 右侧保费拆分，1080p 下一屏看完 */}
+      {calculation.result && <CargoInsuranceStats result={calculation.result} />}
+      <div className="grid items-start gap-3 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
         <CargoInsuranceForm
           form={form}
           onNumericChange={updateNumeric}
@@ -102,7 +104,7 @@ export default function CargoInsuranceCalculatorPage() {
           onReset={() => setForm(createInitialForm())}
         />
         {calculation.result
-          ? <div className={TOOL_RESULT_COLUMN}><CargoInsuranceResult result={calculation.result} summaryText={summaryText} /></div>
+          ? <CargoInsuranceResult result={calculation.result} summaryText={summaryText} />
           : <div className="rounded-md border border-dashed p-6 text-center text-[12px] text-muted-foreground">修正参数后查看保费测算</div>}
       </div>
     </ToolShell>

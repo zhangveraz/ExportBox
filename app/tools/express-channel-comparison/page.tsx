@@ -89,19 +89,34 @@ export default function ExpressChannelComparisonPage() {
       description="自动判断实重或体积重，并区分空运、商业快递、DDP 专线及货代报价方式"
       onReset={reset}
     >
-      <div className="space-y-3">
-        {/* 上排：货物信息 + 重量口径，并排省掉一整屏的高度 */}
-        <div className="grid items-start gap-3 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
-          <ExpressShipmentForm
-            form={shipment}
-            onTextChange={updateShipment}
-            onNumericChange={updateShipment}
-            onCargoTypeChange={(cargoType: CargoType) => setShipment((current) => ({ ...current, cargoType }))}
-          />
-          <ExpressWeightSummary shipment={shipment} />
+      <div className="space-y-2.5">
+        {/* 顶部四格概览，与其余工具保持同一视觉节奏 */}
+        <ExpressComparisonStats results={results} />
+
+        {/* 上排：左边录货物，右边是泡重口径与对比表，1080p 下左右均衡 */}
+        <div className="grid items-start gap-3 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+          <div className="space-y-2.5">
+            <ExpressShipmentForm
+              form={shipment}
+              onTextChange={updateShipment}
+              onNumericChange={updateShipment}
+              onCargoTypeChange={(cargoType: CargoType) => setShipment((current) => ({ ...current, cargoType }))}
+            />
+          </div>
+
+          <div className="space-y-2.5">
+            <ExpressWeightSummary shipment={shipment} />
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-[13px] font-semibold text-slate-900 dark:text-white">对比明细</h2>
+              <EnhancedCopyButton text={copySummary()} disabled={!results.length} variant="outline" size="sm" className="h-7 px-2.5 text-[11px]">
+                复制结果
+              </EnhancedCopyButton>
+            </div>
+            <ExpressComparisonResults results={results} />
+          </div>
         </div>
 
-        {/* 渠道报价：三家并排 */}
+        {/* 通栏货代报价：三家渠道并排，宽度足够时一行放下更多字段，避免整页过高 */}
         <ExpressQuoteForm
           channels={channels}
           onNameChange={(id, value) => updateChannel(id, 'name', value)}
@@ -110,15 +125,6 @@ export default function ExpressChannelComparisonPage() {
           onPricingModeChange={(id, value: ExpressPricingMode) => updateChannel(id, 'pricingMode', value)}
           onNumericChange={(id, field: ChannelNumericField, value) => updateChannel(id, field, value)}
         />
-
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-sm font-semibold text-slate-900 dark:text-white">对比明细</h2>
-          <EnhancedCopyButton text={copySummary()} disabled={!results.length} variant="outline" size="sm" className="h-7 px-2.5 text-xs">
-            复制结果
-          </EnhancedCopyButton>
-        </div>
-        <ExpressComparisonStats results={results} />
-        <ExpressComparisonResults results={results} />
       </div>
     </ToolShell>
   )

@@ -10,7 +10,7 @@ import { useMemo, useState } from 'react'
 import { ContainerLoadForm } from './container-load-form'
 import { INITIAL_FORM, formatNumber, toNumber, type FormState, type NumericField } from './container-load-page-data'
 import { ContainerLoadResults, ContainerLoadStats } from './container-load-results'
-import { TOOL_RESULT_COLUMN, ToolShell } from '@/components/tools/tool-shell'
+import { ToolShell } from '@/components/tools/tool-shell'
 import { calculateContainerLoad, type ContainerType } from '@/lib/tools/container-load-calculator'
 
 export default function ContainerLoadCalculatorPage() {
@@ -39,8 +39,9 @@ export default function ContainerLoadCalculatorPage() {
       description="根据纸箱尺寸、单箱毛重和总箱数估算整柜装载数量、柜数和利用率"
       onReset={() => setForm(INITIAL_FORM)}
     >
-      {/* 左侧只有箱规和柜型，右侧是柜数看板 + 利用率，右列明显更宽 */}
-      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)]">
+      {/* 顶部四格概览 + 左侧录参 / 右侧结果，1080p 下一屏看完 */}
+      <ContainerLoadStats result={result} />
+      <div className="grid items-start gap-3 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
         <ContainerLoadForm
           form={form}
           doesNotFit={doesNotFit}
@@ -49,11 +50,7 @@ export default function ContainerLoadCalculatorPage() {
           onPreset={(values) => setForm((current) => ({ ...current, ...values }))}
           summaryText={getSummaryText()}
         />
-        {/* 结果区吸顶显示，改动参数时不用来回滚 */}
-        <div className={TOOL_RESULT_COLUMN}>
-          <ContainerLoadStats result={result} />
-          <ContainerLoadResults result={result} containerType={form.containerType} />
-        </div>
+        <ContainerLoadResults result={result} containerType={form.containerType} />
       </div>
     </ToolShell>
   )

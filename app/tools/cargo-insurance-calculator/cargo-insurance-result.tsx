@@ -4,7 +4,7 @@
 // 作者: ExportBox
 // 更新时间: 2026-11-01
 
-import { AlertTriangle, Info, Umbrella } from 'lucide-react'
+import { AlertTriangle, Info, Ship, ShieldCheck, Umbrella, Wallet } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { EnhancedCopyButton } from '@/components/tools/enhanced-copy-button'
 import type { CargoInsuranceResult } from '@/lib/tools/cargo-insurance-calculator'
@@ -15,27 +15,44 @@ export interface CargoInsuranceResultProps {
   summaryText: string
 }
 
-export function CargoInsuranceResult({ result, summaryText }: CargoInsuranceResultProps) {
+export interface CargoInsuranceStatsProps {
+  result: CargoInsuranceResult
+}
+
+/** 顶部四格概览：总保费 / 投保金额 / CIF 价值 / 基础险保费 */
+export function CargoInsuranceStats({ result }: CargoInsuranceStatsProps) {
   const currency = result.currency
   const stats = [
-    { label: '总保费', value: formatMoney(result.totalPremium, currency), note: `占 CIF ${result.effectivePremiumRateOnCif}%` },
-    { label: '投保金额', value: formatMoney(result.insuredAmount, currency), note: `CIF 的 ${result.insuredPercentOfCif}%` },
-    { label: '折算 CIF 价值', value: formatMoney(result.cifValue, currency), note: result.priceBasis === 'CIF' ? '直接以货值投保' : `由 ${result.priceBasis} 换算` },
-    { label: '基础险保费', value: formatMoney(result.basePremium, currency), note: result.warRiskPremium > 0 ? `战争险另计 ${formatMoney(result.warRiskPremium, currency)}` : '未附加战争险' },
+    { label: '总保费', value: formatMoney(result.totalPremium, currency), note: `占 CIF ${result.effectivePremiumRateOnCif}%`, icon: Wallet },
+    { label: '投保金额', value: formatMoney(result.insuredAmount, currency), note: `CIF 的 ${result.insuredPercentOfCif}%`, icon: ShieldCheck },
+    { label: '折算 CIF 价值', value: formatMoney(result.cifValue, currency), note: result.priceBasis === 'CIF' ? '直接以货值投保' : `由 ${result.priceBasis} 换算`, icon: Ship },
+    { label: '基础险保费', value: formatMoney(result.basePremium, currency), note: result.warRiskPremium > 0 ? `战争险另计 ${formatMoney(result.warRiskPremium, currency)}` : '未附加战争险', icon: Umbrella },
   ]
 
   return (
-    <div className="space-y-2.5">
-      <div className="grid grid-cols-2 gap-2 xl:grid-cols-4">
-        {stats.map((stat) => (
-          <div key={stat.label} className="rounded-lg border bg-muted/30 px-2.5 py-1.5">
-            <p className="truncate text-[10px] leading-3 text-muted-foreground">{stat.label}</p>
-            <p className="wrap-break-word text-[13px] leading-5 font-semibold tabular-nums">{stat.value}</p>
-            <p className="truncate text-[10px] leading-3 text-muted-foreground" title={stat.note}>{stat.note}</p>
+    <div className="mb-2.5 grid grid-cols-2 gap-2 xl:grid-cols-4">
+      {stats.map((stat) => {
+        const Icon = stat.icon
+        return (
+          <div key={stat.label} className="flex items-center gap-2 rounded-lg border bg-muted/30 px-2.5 py-1.5">
+            <Icon className="h-3.5 w-3.5 shrink-0 text-primary" />
+            <div className="min-w-0">
+              <p className="truncate text-[10px] leading-3 text-muted-foreground">{stat.label}</p>
+              <p className="truncate text-[13px] leading-4 font-semibold tabular-nums" title={stat.value}>{stat.value}</p>
+              <p className="truncate text-[10px] leading-3 text-muted-foreground" title={stat.note}>{stat.note}</p>
+            </div>
           </div>
-        ))}
-      </div>
+        )
+      })}
+    </div>
+  )
+}
 
+export function CargoInsuranceResult({ result, summaryText }: CargoInsuranceResultProps) {
+  const currency = result.currency
+
+  return (
+    <div className="space-y-2">
       <Card className="gap-0 py-0">
         <CardContent className="px-3 pt-2.5 pb-2.5">
           <div className="flex items-start justify-between gap-2">
@@ -70,7 +87,7 @@ export function CargoInsuranceResult({ result, summaryText }: CargoInsuranceResu
           <span className="ml-auto text-[11px] font-normal text-muted-foreground group-open:hidden">展开</span>
         </summary>
         <div className="mt-2 overflow-x-auto">
-          <table className="w-full min-w-[520px] border-collapse text-[11px]">
+          <table className="w-full min-w-[430px] border-collapse text-[11px]">
             <thead>
               <tr className="border-b text-left text-[10px] text-muted-foreground">
                 <th className="py-1 pr-3 font-medium">条款</th>

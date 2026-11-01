@@ -10,7 +10,7 @@ import { useMemo, useState } from 'react'
 import { ImportCostForm } from './import-cost-form'
 import { INITIAL_FORM, buildSummary, toNumber, type FormState, type NumericField } from './import-cost-page-data'
 import { ImportCostResults, ImportCostStats } from './import-cost-results'
-import { TOOL_RESULT_COLUMN, ToolShell } from '@/components/tools/tool-shell'
+import { ToolShell } from '@/components/tools/tool-shell'
 import { calculateImportLandedCost, type ImportCurrency, type ImportLandedCostInputs } from '@/lib/tools/import-landed-cost-calculator'
 
 export default function ImportLandedCostCalculatorPage() {
@@ -30,23 +30,19 @@ export default function ImportLandedCostCalculatorPage() {
     <ToolShell
       title="进口到岸成本计算器"
       description="按货值、国际运费、保险、关税、进口增值税和本地清关费用测算到岸总成本与每件成本"
-      onReset={() => setForm(INITIAL_FORM)}
     >
-      {/* 税费口径长、字段多，左右接近对半，右列稍宽一点点 */}
-      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1fr)]">
+      {/* 顶部四格概览 + 左侧密集录参 / 右侧结果卡，1080p 下尽量一屏看完 */}
+      <ImportCostStats result={result} />
+      <div className="grid items-start gap-3 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
         <ImportCostForm
           form={form}
-          goodsValue={formatForeign(result.goodsValueForeign)}
-          foreignCostTotal={formatForeign(result.foreignCostTotal)}
           onFieldChange={updateField}
           onCurrencyChange={(currency: ImportCurrency, exchangeRate: string) => setForm((current) => ({ ...current, currency, exchangeRate }))}
           onPreset={(values) => setForm((current) => ({ ...current, ...values }))}
+          onReset={() => setForm(INITIAL_FORM)}
           summaryText={getSummaryText()}
         />
-        <div className={TOOL_RESULT_COLUMN}>
-          <ImportCostStats result={result} />
-          <ImportCostResults result={result} currency={form.currency} />
-        </div>
+        <ImportCostResults result={result} />
       </div>
     </ToolShell>
   )

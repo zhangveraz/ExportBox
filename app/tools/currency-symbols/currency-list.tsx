@@ -51,7 +51,7 @@ export function CurrencyList(props: CurrencyListProps) {
               className={`group rounded-md border bg-white/80 px-2 py-1.5 transition-colors hover:border-emerald-300 hover:bg-emerald-50/50 dark:bg-slate-950/50 dark:hover:border-cyan-300/40 ${props.favorites.includes(currency.code) ? 'border-amber-300 ring-1 ring-amber-300/60' : 'border-slate-200/80 dark:border-white/10'}`}
             >
               <div className="flex items-center gap-1.5">
-                <span className="w-6 shrink-0 text-center text-lg leading-6 font-bold text-primary" title={currency.symbol}>{currency.symbol}</span>
+                <span className="min-w-7 shrink-0 whitespace-nowrap text-center text-base leading-6 font-bold text-primary" title={currency.symbol}>{currency.symbol}</span>
                 <span className="shrink-0 text-[12px] font-semibold">{currency.code}</span>
                 <span className="min-w-0 flex-1 truncate text-[10px] text-muted-foreground" title={`${currency.name} (${currency.nameEn})`}>{currency.name}</span>
                 <button

@@ -10,7 +10,7 @@ import { useMemo, useState } from 'react'
 import { OceanFreightForm } from './ocean-freight-form'
 import { INITIAL_FORM, formatCny, formatNumber, toNumber, type FormState, type NumericField } from './ocean-freight-page-data'
 import { OceanFreightResults, OceanFreightStats } from './ocean-freight-results'
-import { TOOL_RESULT_COLUMN, ToolShell } from '@/components/tools/tool-shell'
+import { ToolShell } from '@/components/tools/tool-shell'
 import { calculateOceanFreight, type OceanFreightInputs, type OceanFreightMode } from '@/lib/tools/ocean-freight-calculator'
 
 export default function OceanFreightCalculatorPage() {
@@ -38,13 +38,11 @@ export default function OceanFreightCalculatorPage() {
       description="汇总海运费、起运港杂费、拖车、报关、保险和目的港费用，快速折算每件、每 CBM 与每柜成本"
       onReset={() => setForm(INITIAL_FORM)}
     >
-      {/* 费用字段最多（9~12 项），左侧表单优先，右列保持略窄于参数区 */}
-      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
+      {/* 顶部四格概览 + 左侧录参 / 右侧费用拆分，1080p 下一屏看完 */}
+      <OceanFreightStats result={result} form={form} />
+      <div className="grid items-start gap-3 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
         <OceanFreightForm form={form} onFieldChange={updateField} onModeChange={(mode: OceanFreightMode) => setForm((current) => ({ ...current, mode }))} onPreset={(values) => setForm((current) => ({ ...current, ...values }))} summaryText={getSummaryText()} />
-        <div className={TOOL_RESULT_COLUMN}>
-          <OceanFreightStats result={result} form={form} />
-          <OceanFreightResults result={result} form={form} />
-        </div>
+        <OceanFreightResults result={result} form={form} />
       </div>
     </ToolShell>
   )

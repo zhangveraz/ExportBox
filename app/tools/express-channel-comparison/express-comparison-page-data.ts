@@ -94,12 +94,12 @@ export const INITIAL_CHANNELS: ChannelForm[] = [
   },
   {
     id: 'b', name: '商业快递', serviceType: 'express', tradeTerm: 'DAP', divisor: '5000',
-    pricingMode: 'per-kg', quoteAmountCny: '', fuelRatePercent: '0', remoteFeeCny: '0',
+    pricingMode: 'per-kg', quoteAmountCny: '88', fuelRatePercent: '0', remoteFeeCny: '0',
     customsFeeCny: '0', otherFeeCny: '0', transitDaysMin: '5', transitDaysMax: '7',
   },
   {
     id: 'c', name: '空运渠道', serviceType: 'air', tradeTerm: 'CPT', divisor: '6000',
-    pricingMode: 'per-kg', quoteAmountCny: '', fuelRatePercent: '0', remoteFeeCny: '0',
+    pricingMode: 'per-kg', quoteAmountCny: '42', fuelRatePercent: '0', remoteFeeCny: '0',
     customsFeeCny: '0', otherFeeCny: '0', transitDaysMin: '5', transitDaysMax: '8',
   },
 ]

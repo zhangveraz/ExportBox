@@ -22,10 +22,10 @@ export const INITIAL_FORM: FormState = {
   targetSellingPriceCny: String(DEFAULT_IMPORT_LANDED_COST_INPUTS.targetSellingPriceCny), currency: 'USD',
 }
 
-export const IMPORT_PRESETS: Array<{ label: string; values: Partial<FormState> }> = [
-  { label: '常规进口', values: INITIAL_FORM },
-  { label: '高税率商品', values: { currency: 'USD', quantity: '600', unitPriceForeign: '28', exchangeRate: '7.2', internationalFreightForeign: '1200', insuranceForeign: '150', otherForeignCost: '80', dutyRatePercent: '15', vatRatePercent: '13', customsFeeCny: '680', portChargeCny: '1800', domesticFreightCny: '1300', otherLocalCostCny: '300', targetSellingPriceCny: '268' } },
-  { label: '人民币采购', values: { currency: 'CNY', quantity: '300', unitPriceForeign: '96', exchangeRate: '1', internationalFreightForeign: '2200', insuranceForeign: '120', otherForeignCost: '0', dutyRatePercent: '8', vatRatePercent: '13', customsFeeCny: '500', portChargeCny: '900', domesticFreightCny: '650', otherLocalCostCny: '150', targetSellingPriceCny: '148' } },
+export const IMPORT_PRESETS: Array<{ label: string; description: string; values: Partial<FormState> }> = [
+  { label: '常规进口', description: '美元采购 · 关税 6%', values: INITIAL_FORM },
+  { label: '高税率商品', description: '关税 15% · 600 件', values: { currency: 'USD', quantity: '600', unitPriceForeign: '28', exchangeRate: '7.2', internationalFreightForeign: '1200', insuranceForeign: '150', otherForeignCost: '80', dutyRatePercent: '15', vatRatePercent: '13', customsFeeCny: '680', portChargeCny: '1800', domesticFreightCny: '1300', otherLocalCostCny: '300', targetSellingPriceCny: '268' } },
+  { label: '人民币采购', description: '国内采购 · 无汇率', values: { currency: 'CNY', quantity: '300', unitPriceForeign: '96', exchangeRate: '1', internationalFreightForeign: '2200', insuranceForeign: '120', otherForeignCost: '0', dutyRatePercent: '8', vatRatePercent: '13', customsFeeCny: '500', portChargeCny: '900', domesticFreightCny: '650', otherLocalCostCny: '150', targetSellingPriceCny: '148' } },
 ]
 
 const CNY_FORMATTER = new Intl.NumberFormat('zh-CN', { style: 'currency', currency: 'CNY', maximumFractionDigits: 2 })
