@@ -53,7 +53,8 @@ const beforeAmount = numbers().join('|')
 setValue(q('#orderAmount'), '320000')
 const afterAmount = numbers().join('|')
 ok(beforeAmount !== afterAmount, '修改订单金额后结果刷新')
-ok(afterAmount.includes('97,689.00'), '按 32 万美元与 7.15 汇率折算到手金额')
+// 320000 × 7.15 = 2,288,000，扣掉渠道手续费 7,185.75 后到手 2,280,814.25
+ok(afterAmount.includes('2,280,814.25'), '按 32 万美元与 7.15 汇率折算到手金额')
 ok(numbers().some((item) => item.includes('7,185.75')), '第三方渠道手续费按 3.4% 放大')
 
 const bearerBefore = text('#feeBearer')

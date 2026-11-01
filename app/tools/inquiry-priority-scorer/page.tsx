@@ -213,7 +213,7 @@ export default function InquiryPriorityScorerPage() {
               <>
                 <div className="space-y-1">
                   <div className="flex items-end justify-between gap-2">
-                    <span className={'font-mono text-xl font-bold leading-6 tabular-nums ' + levelTone}>{result.data.total}<span className="ml-0.5 text-[10px] font-normal text-muted-foreground">/100</span></span>
+                    <span data-testid="total-score" className={'font-mono text-xl font-bold leading-6 tabular-nums ' + levelTone}>{result.data.total}<span className="ml-0.5 text-[10px] font-normal text-muted-foreground">/100</span></span>
                     <span className="text-[10px] text-muted-foreground">{result.data.responseWithinHours} 小时内首次回复</span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">

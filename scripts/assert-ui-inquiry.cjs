@@ -45,20 +45,21 @@ const root = createRoot(document.getElementById('root'))
 React.act(() => { root.render(React.createElement(page.default)) })
 
 ok(text('h1').includes('外贸询盘优先级评估'), '页面标题渲染')
-const scoreBefore = text('span.font-mono.text-3xl')
+const TOTAL_SCORE = '[data-testid="total-score"]'
+const scoreBefore = text(TOTAL_SCORE)
 ok(scoreBefore !== '', '总分渲染 ' + scoreBefore)
 ok(all('button[aria-pressed]').length >= 14, '十四个维度开关渲染')
 
-const target = findByText('button[aria-pressed]', '缺失')
+const target = all('button[aria-pressed="false"]')[0]
 ok(Boolean(target), '存在处于缺失状态的维度')
 click(target)
-const scoreAfter = text('span.font-mono.text-3xl')
+const scoreAfter = text(TOTAL_SCORE)
 ok(scoreBefore !== scoreAfter, '切换维度后总分变化 ' + scoreBefore + ' -> ' + scoreAfter)
 ok(bodyText().includes('小时内首次回复'), '页面给出建议响应时限')
 
-const scoreBeforeLength = text('span.font-mono.text-3xl')
+const scoreBeforeLength = text(TOTAL_SCORE)
 setValue(q('#messageLength'), '9')
-const scoreAfterLength = text('span.font-mono.text-3xl')
+const scoreAfterLength = text(TOTAL_SCORE)
 ok(scoreBeforeLength !== scoreAfterLength || scoreBeforeLength === '98', '正文段落数影响加分')
 
 ok(findByText('button', '复制中文追问') !== undefined, '中文追问按钮存在')
