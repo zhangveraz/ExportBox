@@ -17,6 +17,7 @@
     "start": "next start",
     "lint": "eslint app components lib",
     "test": "node scripts/run-tests.cjs",
+    "test:web": "node scripts/verify-web.cjs",
     "test:unit-converter": "node scripts/assert-unit-converter.cjs",
     "test:delivery-date": "node scripts/assert-delivery-date.cjs",
     "test:freight-audit": "node scripts/assert-freight-charge-audit.cjs",
