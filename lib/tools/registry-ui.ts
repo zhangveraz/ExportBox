@@ -1,0 +1,246 @@
+// 名称: 工具 UI 配置
+// 描述: 为工具注册表条目提供 UI 样式映射（颜色、徽章颜色等）
+// 路径: ExportBox/lib/tools/registry-ui.ts
+// 作者: ExportBox
+// 更新时间: 2026-08-11
+
+/**
+ * UI styling configuration for tools on the homepage.
+ * Maps tool IDs to their color scheme.
+ */
+export const TOOL_UI_CONFIG: Record<
+  string,
+  {
+    color: string
+    bgColor: string
+  }
+> = {
+  'discount-volume-calculator': {
+    color: 'text-teal-600',
+    bgColor: 'bg-teal-50',
+  },
+  'payment-risk-guide': {
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50',
+  },
+  'image-compressor': {
+    color: 'text-rose-500',
+    bgColor: 'bg-rose-50',
+  },
+  'lc-discount-calculator': {
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-50',
+  },
+  'packing-list-generator': {
+    color: 'text-cyan-700',
+    bgColor: 'bg-cyan-50',
+  },
+  'email-signature-generator': {
+    color: 'text-indigo-500',
+    bgColor: 'bg-indigo-50',
+  },
+  'payment-reminder-generator': {
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-50',
+  },
+  'currency-converter': {
+    color: 'text-teal-500',
+    bgColor: 'bg-teal-50',
+  },
+  'commission-calculator': {
+    color: 'text-fuchsia-500',
+    bgColor: 'bg-fuchsia-50',
+  },
+  'invoice-generator': {
+    color: 'text-violet-500',
+    bgColor: 'bg-violet-50',
+  },
+  'shipping-mark-generator': {
+    color: 'text-lime-700',
+    bgColor: 'bg-lime-50',
+  },
+  'lc-discrepancy-checklist': {
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+  },
+  'cargo-insurance-calculator': {
+    color: 'text-sky-700',
+    bgColor: 'bg-sky-50',
+  },
+  'remittance-cost-calculator': {
+    color: 'text-sky-500',
+    bgColor: 'bg-sky-50',
+  },
+  'inquiry-priority-scorer': {
+    color: 'text-rose-500',
+    bgColor: 'bg-rose-50',
+  },
+  'yaml-json-converter': {
+    color: 'text-teal-500',
+    bgColor: 'bg-teal-50',
+  },
+  'rmb-converter': {
+    color: 'text-blue-500',
+    bgColor: 'bg-blue-50',
+  },
+  'text-case': {
+    color: 'text-green-500',
+    bgColor: 'bg-green-50',
+  },
+  'special-char': {
+    color: 'text-yellow-500',
+    bgColor: 'bg-yellow-50',
+  },
+  'number-to-english': {
+    color: 'text-purple-500',
+    bgColor: 'bg-purple-50',
+  },
+  'pinyin': {
+    color: 'text-red-500',
+    bgColor: 'bg-red-50',
+  },
+  'holiday-query': {
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-50',
+  },
+  'delivery-date-calculator': {
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-50',
+  },
+  'world-time': {
+    color: 'text-indigo-500',
+    bgColor: 'bg-indigo-50',
+  },
+  'currency-symbols': {
+    color: 'text-emerald-500',
+    bgColor: 'bg-emerald-50',
+  },
+  'global-country-info': {
+    color: 'text-cyan-500',
+    bgColor: 'bg-cyan-50',
+  },
+  'quote-calculator': {
+    color: 'text-sky-500',
+    bgColor: 'bg-sky-50',
+  },
+  'tiered-quote-calculator': {
+    color: 'text-indigo-700',
+    bgColor: 'bg-indigo-50',
+  },
+  'order-break-even-calculator': {
+    color: 'text-emerald-700',
+    bgColor: 'bg-emerald-50',
+  },
+  'supplier-quote-comparison': {
+    color: 'text-cyan-700',
+    bgColor: 'bg-cyan-50',
+  },
+  'payment-terms-calculator': {
+    color: 'text-amber-700',
+    bgColor: 'bg-amber-50',
+  },
+  'fx-sensitivity-calculator': {
+    color: 'text-teal-700',
+    bgColor: 'bg-teal-50',
+  },
+  'export-tax-rebate-calculator': {
+    color: 'text-green-600',
+    bgColor: 'bg-green-50',
+  },
+  'import-landed-cost-calculator': {
+    color: 'text-rose-600',
+    bgColor: 'bg-rose-50',
+  },
+  'container-load-calculator': {
+    color: 'text-lime-600',
+    bgColor: 'bg-lime-50',
+  },
+  'pallet-load-calculator': {
+    color: 'text-fuchsia-600',
+    bgColor: 'bg-fuchsia-50',
+  },
+  'air-freight-calculator': {
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-50',
+  },
+  'ocean-freight-calculator': {
+    color: 'text-cyan-600',
+    bgColor: 'bg-cyan-50',
+  },
+  'demurrage-detention-calculator': {
+    color: 'text-orange-700',
+    bgColor: 'bg-orange-50',
+  },
+  'freight-charge-audit': {
+    color: 'text-rose-600',
+    bgColor: 'bg-rose-50',
+  },
+  'customs-cost-calculator': {
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50',
+  },
+  'express-channel-comparison': {
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-50',
+  },
+  'json-formatter': {
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-50',
+  },
+  'barcode-generator': {
+    color: 'text-slate-700',
+    bgColor: 'bg-slate-100',
+  },
+  'unit-converter': {
+    color: 'text-teal-600',
+    bgColor: 'bg-teal-50',
+  },
+  'packaging-plan-comparison': {
+    color: 'text-indigo-600',
+    bgColor: 'bg-indigo-50',
+  },
+  'csv-to-markdown': {
+    color: 'text-orange-600',
+    bgColor: 'bg-orange-50',
+  },
+  'timestamp-converter': {
+    color: 'text-sky-600',
+    bgColor: 'bg-sky-50',
+  },
+  'email-phrase-library': {
+    color: 'text-blue-700',
+    bgColor: 'bg-blue-50',
+  },
+  'glossary': {
+    color: 'text-indigo-600',
+    bgColor: 'bg-indigo-50',
+  },
+  'voltage-plug-guide': {
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-50',
+  },
+}
+
+export const TOOL_BADGE_STYLES: Record<string, string> = {
+  '热门': 'bg-amber-100 text-amber-700 ring-1 ring-amber-200/80 dark:bg-amber-300/15 dark:text-amber-200 dark:ring-amber-300/20',
+  '新增': 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200/80 dark:bg-cyan-300/15 dark:text-cyan-200 dark:ring-cyan-300/20',
+}
+
+export function getToolBadgeClassName(badge?: string) {
+  if (!badge) return ''
+  return TOOL_BADGE_STYLES[badge] ?? 'bg-slate-100 text-slate-700 ring-1 ring-slate-200/80'
+}
+
+/**
+ * Map lucide icon names to their imports.
+ * This allows dynamic icon rendering based on registry iconName field.
+ */
+export const LUCIDE_ICON_MAP: Record<string, any> = {}
+
+/**
+ * For client-side rendering, pass the actual icon components map.
+ * This function should be called in client components that need icon mapping.
+ */
+export function setupIconMap(icons: Record<string, any>) {
+  Object.assign(LUCIDE_ICON_MAP, icons)
+}

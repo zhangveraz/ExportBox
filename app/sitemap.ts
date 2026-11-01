@@ -1,0 +1,65 @@
+// 名称: 站点地图
+// 描述: 基于工具注册表生成首页与工具页 sitemap
+// 路径: ExportBox/app/sitemap.ts
+// 作者: ExportBox
+// 更新时间: 2026-07-06
+
+import type { MetadataRoute } from 'next'
+import { SITE_URL } from '@/lib/site'
+import { TOOL_REGISTRY } from '@/lib/tools/registry'
+
+function absoluteUrl(path: string) {
+  return new URL(path, SITE_URL).toString()
+}
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  const latestToolDate = TOOL_REGISTRY.reduce(
+    (latest, tool) => (tool.updatedAt > latest ? tool.updatedAt : latest),
+    '2026-01-01'
+  )
+
+  return [
+    {
+      url: absoluteUrl('/'),
+      lastModified: new Date(latestToolDate),
+      changeFrequency: 'weekly',
+      priority: 1,
+    },
+    {
+      url: absoluteUrl('/resources'),
+      lastModified: new Date('2026-07-06'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: absoluteUrl('/tools'),
+      lastModified: new Date(latestToolDate),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: absoluteUrl('/faq'),
+      lastModified: new Date('2026-10-12'),
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    {
+      url: absoluteUrl('/about'),
+      lastModified: new Date('2026-10-10'),
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    {
+      url: absoluteUrl('/privacy'),
+      lastModified: new Date('2026-10-10'),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    ...TOOL_REGISTRY.map((tool) => ({
+      url: absoluteUrl(tool.href),
+      lastModified: new Date(tool.updatedAt),
+      changeFrequency: 'monthly' as const,
+      priority: tool.badge === '热门' ? 0.9 : 0.8,
+    })),
+  ]
+}

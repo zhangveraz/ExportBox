@@ -1,0 +1,128 @@
+// 名称: 增强型复制按钮
+// 描述: 带有视觉反馈和状态管理的复制按钮
+// 路径: ExportBox/components/tools/enhanced-copy-button.tsx
+// 作者: ExportBox
+// 更新时间: 2026-07-30
+
+'use client'
+
+import { useState } from 'react'
+import { Check, ClipboardCopy } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+
+export interface EnhancedCopyButtonProps {
+  text: string
+  onCopy?: () => void
+  children?: React.ReactNode
+  className?: string
+  variant?: 'default' | 'outline' | 'ghost' | 'secondary'
+  size?: 'default' | 'sm' | 'lg' | 'icon'
+  disabled?: boolean
+  iconOnly?: boolean
+  title?: string
+}
+
+async function copyText(text: string) {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch {
+    const textarea = document.createElement('textarea')
+    textarea.value = text
+    textarea.style.position = 'fixed'
+    textarea.style.opacity = '0'
+    document.body.appendChild(textarea)
+    textarea.focus()
+    textarea.select()
+    const copied = document.execCommand('copy')
+    textarea.remove()
+    return copied
+  }
+}
+
+/**
+ * 增强型复制按钮
+ *
+ * 功能:
+ * - 自动复制到剪贴板
+ * - 视觉状态反馈（复制成功）
+ * - 可自定义复制内容
+ * - 错误处理
+ */
+export function EnhancedCopyButton({
+  text,
+  onCopy,
+  children,
+  className,
+  variant = 'default',
+  size = 'default',
+  disabled = false,
+  iconOnly = false,
+  title,
+}: EnhancedCopyButtonProps) {
+  const [copied, setCopied] = useState(false)
+  const [error, setError] = useState(false)
+
+  // 只有「明确要求纯图标」且没有给文字时，才隐藏文字
+  const hasLabel = Boolean(children)
+  const isIconOnly = iconOnly && !hasLabel
+
+  const handleCopy = async () => {
+    try {
+      const success = await copyText(text)
+      if (!success) throw new Error('浏览器拒绝了剪贴板写入')
+      setCopied(true)
+      setError(false)
+      onCopy?.()
+
+      // 1.8秒后重置状态
+      setTimeout(() => {
+        setCopied(false)
+      }, 1800)
+    } catch (err) {
+      console.error('复制失败:', err)
+      setError(true)
+      setTimeout(() => {
+        setError(false)
+      }, 2000)
+    }
+  }
+
+  return (
+    <Button
+      type="button"
+      variant={variant}
+      size={size}
+      onClick={handleCopy}
+      disabled={disabled || !text}
+      aria-label={isIconOnly ? title || '复制内容' : undefined}
+      title={title}
+      className={cn(
+        'transition-all',
+        // 纯图标时清掉内边距，否则图标会被挤成一条缝
+        isIconOnly && 'p-0',
+        copied && 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500',
+        error && 'bg-red-600 hover:bg-red-700',
+        className
+      )}
+    >
+      {copied ? (
+        <>
+          <Check className={cn('h-4 w-4 shrink-0', !isIconOnly && 'mr-1.5')} />
+          {!isIconOnly && '已复制'}
+        </>
+      ) : error ? (
+        <>
+          <ClipboardCopy className={cn('h-4 w-4 shrink-0', !isIconOnly && 'mr-1.5')} />
+          {!isIconOnly && '复制失败'}
+        </>
+      ) : (
+        <>
+          <ClipboardCopy className={cn('h-4 w-4 shrink-0', !isIconOnly && 'mr-1.5')} />
+          {!isIconOnly && (children || '复制结果')}
+        </>
+      )}
+    </Button>
+  )
+}

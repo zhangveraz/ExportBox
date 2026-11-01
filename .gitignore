@@ -1,0 +1,34 @@
+# dependencies
+node_modules
+
+# next.js build output
+.next
+out
+dist
+build
+*.tsbuildinfo
+
+# environment / secrets
+.env
+.env.local
+.env*.local
+
+# logs
+logs/
+*.log
+*.err
+
+# os metadata
+.DS_Store
+Thumbs.db
+
+# local test artifacts
+.ui-test-bundles/
+tmp-*
+.web-verify/
+
+# local-only dev notes (kept on disk, not published)
+PROGRESS.md
+PROJECT-AUDIT.md
+BATCH-OPTIMIZATION-PLAN.md
+.codex/

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 40 40" fill="none" role="img" aria-label="ExportBox">
+  <defs>
+    <linearGradient id="eb-apple-grad" x1="2" y1="2" x2="38" y2="38" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5AA9FF" />
+      <stop offset="1" stop-color="#1F63D6" />
+    </linearGradient>
+  </defs>
+  <rect width="40" height="40" rx="9" fill="url(#eb-apple-grad)" />
+  <path d="M12 28 L25 15" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" />
+  <path d="M17 13 H27 V23" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
