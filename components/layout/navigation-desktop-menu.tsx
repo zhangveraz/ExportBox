@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { ArrowRight, Search } from 'lucide-react'
 import type { ToolCategory, ToolMeta } from '@/lib/tools/registry'
 import { cn } from '@/lib/utils'
-import { CategorySidebar, NewToolsSidebar } from './navigation-desktop-sidebars'
+import { CategorySidebar, FavoritesSidebar } from './navigation-desktop-sidebars'
 import { NavigationToolItem } from './navigation-tool-item'
 
 interface DesktopToolsMenuProps {
@@ -96,7 +96,7 @@ export function DesktopToolsMenu({
 
           <div className={cn('grid gap-3', normalizedQuery ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2')}>
             {filteredTools.map((tool) => (
-              <NavigationToolItem key={tool.id} tool={tool} active={pathname === tool.href} onClick={onClose} />
+              <NavigationToolItem key={tool.id} tool={tool} active={pathname === tool.href} showFavorite onClick={onClose} />
             ))}
           </div>
 
@@ -107,7 +107,7 @@ export function DesktopToolsMenu({
           )}
         </section>
 
-        {!normalizedQuery && <NewToolsSidebar onClose={onClose} />}
+        {!normalizedQuery && <FavoritesSidebar onClose={onClose} />}
       </div>
     </div>
   )

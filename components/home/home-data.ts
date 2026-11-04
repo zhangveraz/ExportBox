@@ -5,6 +5,7 @@
 // 更新时间: 2026-08-11
 
 import type { ComponentType } from 'react'
+import { HOME_FLOW_STAGES } from './home-flow'
 import {
   AlertCircle,
   ArrowLeftRight,
@@ -154,7 +155,7 @@ export const HERO_TOOLS = heroToolIds
 
 export const HOME_STATS = [
   { label: '工具总数', value: `${HOME_TOOLS.length}`, icon: Zap },
-  { label: '业务场景', value: `${HOME_ACTIVE_CATEGORIES.length}`, icon: ShieldCheck },
+  { label: '业务环节', value: `${HOME_FLOW_STAGES.length}`, icon: ShieldCheck },
   { label: '国家与地区资料', value: `${COUNTRY_DATA.length}`, icon: Globe },
   { label: '持续优化', value: 'Live', icon: TrendingUp },
 ]

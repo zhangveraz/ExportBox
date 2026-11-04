@@ -8,13 +8,18 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Search, X } from 'lucide-react'
+import { Search, Trash2, X } from 'lucide-react'
 import { SiteSearchPanel } from '@/components/search/site-search'
 
 const FAB_SIZE = 48
-const TAB_SIZE = 30
+// 隐藏后留在屏幕边缘的"恢复块"：手机上也要够大才好点（28×40）
+const TAB_SIZE = 40
 const EDGE_GAP = 20
 const DRAG_THRESHOLD = 5
+/** 手机端长按多久算"长按"（毫秒） */
+const LONG_PRESS_MS = 600
+/** 拖拽时屏幕底部出现的删除位尺寸 */
+const DELETE_ZONE = { width: 132, height: 56, bottom: 28 }
 // 存储键保持不变，之前记住的位置依然有效
 const STORAGE_KEY = 'exportbox-search-fab'
 const HIDDEN_KEY = 'exportbox-search-fab-hidden'
@@ -43,6 +48,24 @@ function trackY() {
 
 function edgeX(side: Side) {
   return side === 'left' ? EDGE_GAP : Math.max(EDGE_GAP, window.innerWidth - FAB_SIZE - EDGE_GAP)
+}
+
+/** 拖拽时屏幕底部中央的删除区（用矩形相交判断，手指压在球上也成立） */
+function deleteZoneRect() {
+  const top = window.innerHeight - DELETE_ZONE.height - DELETE_ZONE.bottom
+  return {
+    left: (window.innerWidth - DELETE_ZONE.width) / 2,
+    top,
+    right: (window.innerWidth + DELETE_ZONE.width) / 2,
+    bottom: top + DELETE_ZONE.height,
+  }
+}
+
+function overlapsDeleteZone(pos: Position) {
+  const zone = deleteZoneRect()
+  const centerX = pos.x + FAB_SIZE / 2
+  const centerY = pos.y + FAB_SIZE / 2
+  return centerX > zone.left && centerX < zone.right && centerY > zone.top && centerY < zone.bottom
 }
 
 function readStored(): StoredState {
@@ -87,6 +110,10 @@ export function SearchFab() {
   // 因为 position 为空时组件不渲染任何东西，所以不会出现水合不一致。
   const [side, setSide] = useState<Side>(() => readStored().side)
   const [dragging, setDragging] = useState(false)
+  // 拖拽进行中（用于显示删除位）、是否已拖到删除位上、是否正在长按
+  const [armed, setArmed] = useState(false)
+  const [overDelete, setOverDelete] = useState(false)
+  const [pressing, setPressing] = useState(false)
   // 用户主动关掉搜索球后，只留一个很小的“恢复”小块，随时可以点回来
   const [hidden, setHidden] = useState(readHidden)
 
@@ -95,6 +122,8 @@ export function SearchFab() {
   const sideRef = useRef<Side>('left')
   const dragState = useRef({ startX: 0, startY: 0, originX: 0, originY: 0, moved: false })
   const draggingRef = useRef(false)
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const longPressFired = useRef(false)
 
   const maxX = () => Math.max(0, window.innerWidth - FAB_SIZE)
   const maxY = () => Math.max(0, window.innerHeight - FAB_SIZE)
@@ -143,6 +172,14 @@ export function SearchFab() {
     }
   }
 
+  const clearLongPress = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current)
+      longPressTimer.current = null
+    }
+    setPressing(false)
+  }
+
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     const current = positionRef.current
     if (!current) return
@@ -155,35 +192,80 @@ export function SearchFab() {
     }
     setDragging(true)
     draggingRef.current = true
-    buttonRef.current?.setPointerCapture(event.pointerId)
+    try {
+      buttonRef.current?.setPointerCapture(event.pointerId)
+    } catch {
+      // 部分环境（或合成事件）不支持指针捕获，忽略即可，拖动依然可用
+    }
+
+    // 手机 / 触控笔：按住 0.6 秒直接隐藏搜索球（鼠标不启用，避免误触）
+    longPressFired.current = false
+    if (event.pointerType !== 'mouse') {
+      clearLongPress()
+      setPressing(true)
+      longPressTimer.current = setTimeout(() => {
+        longPressTimer.current = null
+        longPressFired.current = true
+        setPressing(false)
+        draggingRef.current = false
+        setDragging(false)
+        setArmed(false)
+        setOverDelete(false)
+        setHiddenPersisted(true)
+      }, LONG_PRESS_MS)
+    }
   }
 
   const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!draggingRef.current) return
+    if (longPressFired.current) return
     const state = dragState.current
     const deltaX = event.clientX - state.startX
     const deltaY = event.clientY - state.startY
 
     if (!state.moved && (Math.abs(deltaX) > DRAG_THRESHOLD || Math.abs(deltaY) > DRAG_THRESHOLD)) {
       state.moved = true
+      // 一旦开始拖动就不是长按了
+      clearLongPress()
+      setArmed(true)
     }
 
-    applyPosition({
+    const next = {
       x: clamp(state.originX + deltaX, 0, maxX()),
       y: clamp(state.originY + deltaY, 0, maxY()),
-    })
+    }
+    applyPosition(next)
+    setOverDelete(state.moved && overlapsDeleteZone(next))
   }
 
   const onPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!draggingRef.current) return
+    clearLongPress()
+    if (!draggingRef.current) {
+      longPressFired.current = false
+      return
+    }
     draggingRef.current = false
     setDragging(false)
-    buttonRef.current?.releasePointerCapture(event.pointerId)
+    setArmed(false)
+    try {
+      buttonRef.current?.releasePointerCapture(event.pointerId)
+    } catch {
+      // 同上，忽略
+    }
 
     const current = positionRef.current
     const state = dragState.current
 
     if (!current) return
+
+    // 拖到删除位松手 → 直接隐藏搜索球
+    if (state.moved && overlapsDeleteZone(current)) {
+      setOverDelete(false)
+      longPressFired.current = false
+      setHiddenPersisted(true)
+      return
+    }
+    setOverDelete(false)
 
     // 松手后吸附到更近的一侧，纵向位置保持不变
     const centerX = current.x + FAB_SIZE / 2
@@ -197,10 +279,11 @@ export function SearchFab() {
     // 记住这次的停靠侧与高度，下次打开页面自动还原
     writeStored(nextSide, nextY)
 
-    // 没有位移则视为点击
-    if (!state.moved) {
+    // 没有位移则视为点击（长按触发后不再打开搜索面板）
+    if (!state.moved && !longPressFired.current) {
       setOpen(true)
     }
+    longPressFired.current = false
   }
 
   const tooltipOnLeft = side === 'right'
@@ -240,8 +323,11 @@ export function SearchFab() {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={() => {
+          clearLongPress()
           draggingRef.current = false
           setDragging(false)
+          setArmed(false)
+          setOverDelete(false)
         }}
         style={{
           left: `${position.x}px`,
@@ -255,9 +341,13 @@ export function SearchFab() {
       >
         <button
           type="button"
-          aria-label="搜索工具（可拖动）"
+          aria-label="搜索工具与收藏夹（可拖动）"
           className={`flex h-full w-full items-center justify-center rounded-full bg-linear-to-br from-[#78b0fb] to-[#3d82dc] text-white shadow-md shadow-blue-500/40 hover:shadow-lg hover:shadow-blue-500/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 dark:shadow-blue-950/60 ${
-            dragging ? 'scale-105 shadow-xl shadow-blue-500/60' : 'hover:scale-110'
+            pressing
+              ? 'scale-90 ring-4 ring-blue-400/50'
+              : dragging
+                ? 'scale-105 shadow-xl shadow-blue-500/60'
+                : 'hover:scale-110'
           } transition-transform duration-200`}
         >
           <Search className={`h-5 w-5 ${dragging ? 'scale-90' : ''} transition-transform duration-200`} />
@@ -267,7 +357,7 @@ export function SearchFab() {
         <button
           type="button"
           aria-label="隐藏搜索球"
-          title="隐藏搜索球（可在屏幕边缘点回来）"
+          title="隐藏搜索球（手机端可长按，或拖到屏幕下方的删除位）"
           onPointerDown={(event) => event.stopPropagation()}
           onClick={(event) => {
             event.stopPropagation()
@@ -283,9 +373,24 @@ export function SearchFab() {
             tooltipOnLeft ? 'right-full mr-2.5' : 'left-full ml-2.5'
           }`}
         >
-          搜索工具 · 可拖动
+          搜索 · 收藏夹
         </span>
       </div>
+
+      {/* 拖动时出现在屏幕底部中央的删除位：松手即隐藏搜索球 */}
+      {armed ? (
+        <div
+          style={{ bottom: `${DELETE_ZONE.bottom}px` }}
+          className={`pointer-events-none fixed left-1/2 z-[90] flex -translate-x-1/2 items-center gap-1.5 rounded-full border px-4 py-2 text-[12px] font-medium shadow-lg transition-colors ${
+            overDelete
+              ? 'border-rose-500 bg-rose-500 text-white shadow-rose-500/40'
+              : 'border-slate-200 bg-white/95 text-slate-500 dark:border-white/15 dark:bg-slate-900/95 dark:text-slate-300'
+          }`}
+        >
+          <Trash2 className="h-4 w-4" />
+          {overDelete ? '松手删除' : '拖到这里删除'}
+        </div>
+      ) : null}
 
       <SiteSearchPanel open={open} onClose={() => setOpen(false)} />
     </>,

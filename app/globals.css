@@ -844,9 +844,14 @@
  * 并把 A4 纸张与工具页的字号缩放还原，避免出现「半个屏幕上全是导航」的情况。
  */
 @media print {
+  /*
+   * 纸张边距设为 0：Chrome / Edge 打印对话框里的「页眉和页脚」（网址、日期、页码）
+   * 是画在页面边距里的，边距为 0 就没地方画，PDF 顶部和底部就不会多出文字。
+   * 需要的留白改由打印纸张自己用 padding 补（见下面的 [data-print-sheet]）。
+   */
   @page {
     size: A4 portrait;
-    margin: 10mm;
+    margin: 0;
   }
 
   html,
@@ -855,20 +860,28 @@
   }
 
   /*
-   * 打印隔离：除了装箱单纸张本身，页面上其它东西全部隐藏。
-   * 用 visibility 而不是 display，是为了不影响 A4 纸张自身的排版宽度；
-   * 悬浮球、分类悬浮条是挂到 body 上的浮层，只有这种写法才能一并盖住。
+   * 打印隔离：除了发票/装箱单纸张本身，页面上其它东西全部隐藏。
+   * 这里用两层保险：
+   * 1) 不包含打印区域的元素直接 display:none —— 不占位，才不会多出空白页；
+   * 2) visibility 兜底，万一浏览器不支持 :has()，至少内容不会打印出来。
    */
+  body *:not([data-print-area]):not([data-print-area] *):not(:has([data-print-area])) {
+    display: none !important;
+  }
+
   body * {
     visibility: hidden !important;
   }
 
   #packing-print-area,
-  #packing-print-area * {
+  #packing-print-area *,
+  [data-print-area],
+  [data-print-area] * {
     visibility: visible !important;
   }
 
-  #packing-print-area {
+  #packing-print-area,
+  [data-print-area] {
     position: absolute !important;
     inset: 0 auto auto 0 !important;
     width: 100% !important;
@@ -879,14 +892,37 @@
     zoom: 1 !important;
   }
 
-  /* 打印时去除阴影与圆角，避免 PDF 里出现灰边 */
+  /*
+   * 打印时去除阴影与圆角，避免 PDF 里出现灰边；
+   * 页面边距已经归零，所以这里补上纸张留白（上下 10mm、左右 9mm）。
+   */
   [data-print-sheet] {
     box-shadow: none !important;
     border-radius: 0 !important;
     max-width: none !important;
-    padding: 0 !important;
+    width: 100% !important;
+    padding: 10mm 9mm !important;
     background: #fff !important;
     color: #0f172a !important;
+  }
+
+  /* 屏幕上的滚动容器在打印时会被裁成一页，这里放开 */
+  [data-print-area],
+  [data-print-area] * {
+    overflow: visible !important;
+    max-height: none !important;
+  }
+
+  /* 深色模式下也要打印成白纸黑字 */
+  [data-print-sheet] * {
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+    background-color: transparent !important;
+  }
+
+  [data-print-sheet] thead tr,
+  [data-print-sheet] tfoot tr {
+    background-color: #f1f5f9 !important;
   }
 
   /* 表格跨页时重复表头 */
@@ -896,5 +932,30 @@
 
   tr {
     break-inside: avoid;
+  }
+}
+
+/* ---------------------------------------------------------------
+   手机端（<= 640px）：不用省略号截断，改成自动换行
+   -----------------------------------------------------------------
+   原因：Tailwind 的 .truncate 是 white-space: nowrap，它的「最小宽度」
+   等于整句文字的长度。手机屏幕上这句话动辄 500～700px，会把所在的
+   卡片/表格顶出屏幕右侧，再被外层 overflow-hidden 裁掉，看起来就是
+   「内容显示不全」。手机上没有悬停提示，截断反而让文字彻底读不到，
+   所以窄屏统一改成换行显示。
+   --------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .truncate {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}@media (max-width: 640px) {
+  /* 栅格/弹性布局的子项默认 min-width:auto，会被里面的输入框、长按钮、
+     长文案的「最小宽度」顶住不让收缩，于是整块内容被推出屏幕右侧，
+     再被外层 overflow-hidden 裁掉。手机端放开这个限制，让它能收缩。
+     已经显式写了 min-w-* 的元素不动。 */
+  [data-tool-shell] .grid > *:not([class*='min-w-']),
+  [data-tool-shell] .flex > *:not([class*='min-w-']) {
+    min-width: 0;
   }
 }

@@ -52,6 +52,20 @@ export const NAV_HEADER_TOOLS = NAV_FEATURED_TOOLS.map((tool) => ({
   shortTitle: HEADER_SHORT_TITLE_OVERRIDE[tool.id] ?? tool.shortTitle,
 }))
 
-export const NAV_NEW_TOOLS = TOOL_REGISTRY.filter((tool) => tool.badge === '新增').slice(0, 5)
+/**
+ * 手机端「高频入口」的兜底清单（前 8 个）
+ * 与首页「常用工具」区（components/home/home-data.ts 的 HERO_TOOLS）前 8 个保持一致；
+ * 新用户本机还没有使用记录时，就按这个顺序展示
+ */
+export const NAV_FALLBACK_FREQUENT_TOOLS = [
+  'quote-calculator',
+  'import-landed-cost-calculator',
+  'currency-converter',
+  'ocean-freight-calculator',
+  'air-freight-calculator',
+  'express-channel-comparison',
+  'container-load-calculator',
+  'shipping-mark-generator',
+]
 
 export const NAV_EXTERNAL_LINKS: { href: string; label: string; icon: ComponentType<{ className?: string }> }[] = []

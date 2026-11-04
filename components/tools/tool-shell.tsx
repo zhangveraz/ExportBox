@@ -8,6 +8,7 @@
 
 import type { ReactNode } from 'react'
 import { RefreshCw } from 'lucide-react'
+import { ToolTitleFavorite } from './tool-title-favorite'
 
 /**
  * 全站统一显示密度：字号调整已下线，一律按最大档（1.12）显示。
@@ -53,8 +54,9 @@ export function ToolShell({ title, description, onReset, fixedZoom, children }: 
             {description}
           </p>
         </div>
-        {onReset && (
-          <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
+          <ToolTitleFavorite />
+          {onReset && (
             <button
               type="button"
               onClick={onReset}
@@ -63,8 +65,8 @@ export function ToolShell({ title, description, onReset, fixedZoom, children }: 
               <RefreshCw className="h-3.5 w-3.5" />
               重置
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       {children}
     </div>

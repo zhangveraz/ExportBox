@@ -33,6 +33,7 @@ const scripts = [
   'assert-lc-discount.cjs',
   'assert-payment-risk.cjs',
   'assert-image-compressor.cjs',
+  'assert-home-flow.cjs',
 ]
 
 for (const script of scripts) {

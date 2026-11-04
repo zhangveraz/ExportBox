@@ -159,7 +159,7 @@ export default function PackingListGeneratorPage() {
           />
         </div>
         {computation.totals && computation.header
-          ? <div id="packing-print-area" className="xl:sticky xl:top-20 print:static"><PackingListPreview totals={computation.totals} plainText={computation.plainText} csv={computation.csv} header={computation.header} /></div>
+          ? <div id="packing-print-area" data-print-area className="xl:sticky xl:top-20 print:static"><PackingListPreview totals={computation.totals} plainText={computation.plainText} csv={computation.csv} header={computation.header} /></div>
           : <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground print:hidden">修正明细后查看装箱单预览</div>}
       </div>
     </ToolShell>

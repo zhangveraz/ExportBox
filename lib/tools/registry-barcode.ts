@@ -16,7 +16,7 @@ export const barcodeGeneratorTool: ToolMeta = {
   iconName: 'ScanBarcode',
   href: '/tools/barcode-generator',
   updatedAt: '2026-07-15',
-  badge: '新增',
+  badge: '热门',
   keywords: ['barcode', '条码', 'GS1', 'DataMatrix', 'QR Code', 'EAN', 'UPC', 'ITF-14', 'ISBN'],
   seoTitle: '国际条码生成器 - GS1 DataMatrix/EAN/UPC 在线生成 | ExportBox',
   seoDescription: '免费在线生成符合 GS1 26.0 数据规则的 GS1 DataMatrix、GS1-128，以及 QR Code、EAN-13、UPC-A、ITF-14 等常用条码',

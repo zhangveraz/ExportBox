@@ -1,16 +1,18 @@
 // 名称: 商业发票预览组件
-// 描述: 以 A4 版式实时预览发票，支持复制纯文本与打印
+// 描述: 以 A4 版式实时预览发票，支持复制纯文本、导出 Excel 与打印
 // 路径: ExportBox/app/tools/invoice-generator/invoice-preview.tsx
 // 作者: ExportBox
-// 更新时间: 2026-09-30
+// 更新时间: 2026-11-03
 
 'use client'
 
-import { Printer } from 'lucide-react'
+import { Download, Printer } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { EnhancedCopyButton } from '@/components/tools/enhanced-copy-button'
 import type { InvoiceInput, InvoiceTotals } from '@/lib/tools/invoice-generator'
+import { downloadXlsx } from '@/lib/tools/xlsx-export'
 import { INVOICE_TYPE_NOTES } from './invoice-data'
+import { buildInvoiceWorkbook } from './invoice-workbook'
 
 export interface InvoicePreviewProps {
   input: InvoiceInput
@@ -22,17 +24,27 @@ export function InvoicePreview({ input, totals, plainText }: InvoicePreviewProps
   const title = input.invoiceType === 'proforma' ? 'PROFORMA INVOICE' : 'COMMERCIAL INVOICE'
   const typeNote = INVOICE_TYPE_NOTES.find((note) => note.type === input.invoiceType)
 
+  const handleExportExcel = () => {
+    const fileName = `invoice-${input.invoiceNo || 'export'}.xlsx`
+    downloadXlsx(buildInvoiceWorkbook(input, totals), fileName)
+  }
+
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2 print:hidden">
-        <Button type="button" onClick={() => window.print()} className="h-7 px-2.5 text-[11px]">
-          <Printer className="mr-1.5 h-3.5 w-3.5" />打印 / 导出 PDF
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button type="button" onClick={() => window.print()} className="h-7 px-2.5 text-[11px]">
+            <Printer className="mr-1.5 h-3.5 w-3.5" />打印 / 导出 PDF
+          </Button>
+          <Button type="button" variant="outline" onClick={handleExportExcel} className="h-7 px-2.5 text-[11px]">
+            <Download className="mr-1.5 h-3.5 w-3.5" />导出 Excel
+          </Button>
+        </div>
         <EnhancedCopyButton text={plainText} variant="outline" className="h-7 px-2 text-[11px]">复制纯文本</EnhancedCopyButton>
       </div>
 
-      <div className="max-h-[calc(100vh-230px)] overflow-auto rounded-lg border print:max-h-none print:overflow-visible print:border-0">
-      <div className="mx-auto w-full max-w-[820px] bg-white p-5 text-slate-900 shadow-xs print:max-w-none print:p-0 print:shadow-none dark:bg-slate-900 dark:text-slate-100">
+      <div id="invoice-print-area" data-print-area className="max-h-[calc(100vh-230px)] overflow-auto rounded-lg border print:max-h-none print:overflow-visible print:border-0">
+      <div data-print-sheet className="mx-auto w-full max-w-[820px] bg-white p-3 text-slate-900 shadow-xs sm:p-5 print:max-w-none print:shadow-none dark:bg-slate-900 dark:text-slate-100">
         <div className="flex items-start justify-between border-b-2 border-slate-900 pb-3 dark:border-slate-100">
           <div>
             <h2 className="text-xl font-black tracking-wide">{title}</h2>
@@ -59,30 +71,33 @@ export function InvoicePreview({ input, totals, plainText }: InvoicePreviewProps
           </div>
         </div>
 
-        <table className="mt-3 w-full border-collapse text-[11px]">
+        {/* 手机屏幕上多列表格放不下，允许在这块区域内左右滑动，避免整页被顶宽 */}
+        <div className="mt-3 overflow-x-auto print:overflow-visible">
+        <table className="w-full min-w-[320px] border-collapse text-[11px]">
           <thead>
             <tr className="border border-slate-400 bg-slate-100 text-left text-[10px] uppercase tracking-wide dark:border-slate-500 dark:bg-slate-800">
-              <th className="border border-slate-400 px-2 py-1.5 dark:border-slate-500">No.</th>
-              <th className="border border-slate-400 px-2 py-1.5 dark:border-slate-500">Description</th>
-              <th className="border border-slate-400 px-2 py-1.5 text-right dark:border-slate-500">Qty</th>
-              <th className="border border-slate-400 px-2 py-1.5 dark:border-slate-500">Unit</th>
-              <th className="border border-slate-400 px-2 py-1.5 text-right dark:border-slate-500">Unit Price</th>
-              <th className="border border-slate-400 px-2 py-1.5 text-right dark:border-slate-500">Amount</th>
+              <th className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-1.5 dark:border-slate-500">No.</th>
+              <th className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-1.5 dark:border-slate-500">Description</th>
+              <th className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-1.5 text-right dark:border-slate-500">Qty</th>
+              <th className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-1.5 dark:border-slate-500">Unit</th>
+              <th className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-1.5 text-right dark:border-slate-500">Unit Price</th>
+              <th className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-1.5 text-right dark:border-slate-500">Amount</th>
             </tr>
           </thead>
           <tbody>
             {totals.lines.map((line, index) => (
               <tr key={line.id} className="border border-slate-400 align-top dark:border-slate-500">
-                <td className="border border-slate-400 px-2 py-1.5 dark:border-slate-500">{index + 1}</td>
-                <td className="border border-slate-400 px-2 py-1.5 dark:border-slate-500">{line.description}</td>
-                <td className="border border-slate-400 px-2 py-1.5 text-right tabular-nums dark:border-slate-500">{line.quantity.toLocaleString('en-US', { maximumFractionDigits: 2 })}</td>
-                <td className="border border-slate-400 px-2 py-1.5 dark:border-slate-500">{line.unit}</td>
-                <td className="border border-slate-400 px-2 py-1.5 text-right tabular-nums dark:border-slate-500">{formatAmount(line.unitPrice)}</td>
-                <td className="border border-slate-400 px-2 py-1.5 text-right tabular-nums dark:border-slate-500">{formatAmount(line.amount)}</td>
+                <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-1.5 dark:border-slate-500">{index + 1}</td>
+                <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-1.5 dark:border-slate-500">{line.description}</td>
+                <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-1.5 text-right tabular-nums dark:border-slate-500">{line.quantity.toLocaleString('en-US', { maximumFractionDigits: 2 })}</td>
+                <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-1.5 dark:border-slate-500">{line.unit}</td>
+                <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-1.5 text-right tabular-nums dark:border-slate-500">{formatAmount(line.unitPrice)}</td>
+                <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-1.5 text-right tabular-nums dark:border-slate-500">{formatAmount(line.amount)}</td>
               </tr>
             ))}
           </tbody>
         </table>
+        </div>
 
         <div className="mt-3 flex justify-end">
           <div className="w-full max-w-xs space-y-1 text-[11px]">

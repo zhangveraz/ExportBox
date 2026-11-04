@@ -1,13 +1,14 @@
 // 名称: 桌面导航侧栏
-// 描述: 展示工具分类、精选链路、新工具与外部入口
+// 描述: 左侧展示业务流程分类与收藏夹入口，右侧展示用户收藏的工具
 // 路径: ExportBox/components/layout/navigation-desktop-sidebars.tsx
 // 作者: ExportBox
-// 更新时间: 2026-07-15
+// 更新时间: 2026-11-03
 
 import Link from 'next/link'
-import { ArrowRight, BadgeCheck, ExternalLink, Sparkles } from 'lucide-react'
+import { ArrowRight, BadgeCheck, ExternalLink, Star } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import type { ToolCategory } from '@/lib/tools/registry'
+import { getToolBySlug, type ToolCategory } from '@/lib/tools/registry'
+import { useFavorites } from '@/lib/tools/personalization'
 import { getToolBadgeClassName } from '@/lib/tools/registry-ui'
 import { cn } from '@/lib/utils'
 import {
@@ -15,7 +16,6 @@ import {
   NAV_CATEGORY_META,
   NAV_EXTERNAL_LINKS,
   NAV_FEATURED_TOOLS,
-  NAV_NEW_TOOLS,
   NAV_TOOLS_BY_CATEGORY,
 } from './navigation-data'
 
@@ -26,6 +26,8 @@ interface CategorySidebarProps {
 }
 
 export function CategorySidebar({ activeCategory, onActiveCategoryChange, onClose }: CategorySidebarProps) {
+  const favorites = useFavorites()
+
   return (
     <aside className="h-full overflow-y-auto border-r border-slate-200/80 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-slate-900/70">
       <div className="mb-4 flex items-center justify-between">
@@ -67,6 +69,19 @@ export function CategorySidebar({ activeCategory, onActiveCategoryChange, onClos
             </button>
           )
         })}
+
+        {/* 业务流程下面单独留一个收藏夹入口，点一下跳到收藏夹页面 */}
+        <Link
+          href="/favorites"
+          onClick={onClose}
+          className="group mt-1 flex items-center justify-between rounded-md border border-amber-200/80 bg-amber-50/70 px-3 py-2.5 text-sm transition-all hover:border-amber-300 hover:bg-amber-100/80 dark:border-amber-300/20 dark:bg-amber-300/10 dark:hover:bg-amber-300/20"
+        >
+          <span className="flex min-w-0 items-center gap-2">
+            <Star className="h-4 w-4 shrink-0 fill-amber-400 text-amber-500" />
+            <span className="truncate font-medium text-amber-700 dark:text-amber-200">收藏夹</span>
+          </span>
+          <span className="text-xs text-amber-600 dark:text-amber-300">{favorites.length}</span>
+        </Link>
       </div>
 
       <div className="mt-5 rounded-lg border border-slate-200/80 bg-white p-3 dark:border-white/10 dark:bg-slate-950/50">
@@ -92,55 +107,86 @@ export function CategorySidebar({ activeCategory, onActiveCategoryChange, onClos
   )
 }
 
-export function NewToolsSidebar({ onClose }: { onClose: () => void }) {
+/** 右侧栏：显示用户收藏的工具，没有收藏时给一句提示 */
+export function FavoritesSidebar({ onClose }: { onClose: () => void }) {
+  const favorites = useFavorites()
+  const favoriteTools = favorites
+    .map((slug) => getToolBySlug(slug))
+    .filter((tool): tool is NonNullable<ReturnType<typeof getToolBySlug>> => Boolean(tool))
+
   return (
     <aside className="h-full overflow-y-auto border-l border-slate-200/80 bg-slate-950 p-4 text-white dark:border-white/10">
-      <div className="mb-4 flex items-center gap-2">
-        <Sparkles className="h-4 w-4 text-amber-300" />
-        <p className="text-sm font-semibold">新增工具</p>
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Star className="h-4 w-4 fill-amber-300 text-amber-300" />
+          <p className="text-sm font-semibold">收藏夹</p>
+        </div>
+        {favoriteTools.length > 0 && (
+          <Link
+            href="/favorites"
+            onClick={onClose}
+            className="inline-flex items-center gap-1 text-[11px] text-slate-300 hover:text-white"
+          >
+            全部收藏
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        )}
       </div>
 
-      <div className="space-y-2">
-        {NAV_NEW_TOOLS.map((tool) => (
-          <Link
-            key={tool.id}
-            href={tool.href}
-            onClick={onClose}
-            className="block rounded-md border border-white/10 bg-white/4 p-3 transition-colors hover:border-emerald-300/50 hover:bg-emerald-300/10"
-          >
-            <div className="mb-1 flex items-center justify-between gap-2">
-              <span className="truncate text-sm font-semibold">{tool.shortTitle}</span>
-              <Badge variant="outline" className={cn('shrink-0 border-0 px-2 py-0 text-[10px]', getToolBadgeClassName(tool.badge))}>
-                {tool.badge}
-              </Badge>
-            </div>
-            <p className="line-clamp-2 text-xs leading-5 text-slate-300">{tool.description}</p>
-          </Link>
-        ))}
-      </div>
+      {favoriteTools.length === 0 ? (
+        <div className="rounded-md border border-dashed border-white/15 p-4 text-center">
+          <p className="text-xs font-medium text-slate-200">暂无收藏工具</p>
+          <p className="mt-1.5 text-[11px] leading-5 text-slate-400">
+            在搜索结果里点工具右侧的星标，就能收藏到这里
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {favoriteTools.map((tool) => (
+            <Link
+              key={tool.id}
+              href={tool.href}
+              onClick={onClose}
+              className="block rounded-md border border-white/10 bg-white/4 p-3 transition-colors hover:border-amber-300/50 hover:bg-amber-300/10"
+            >
+              <div className="mb-1 flex items-center justify-between gap-2">
+                <span className="truncate text-sm font-semibold">{tool.shortTitle}</span>
+                {tool.badge ? (
+                  <Badge variant="outline" className={cn('shrink-0 border-0 px-2 py-0 text-[10px]', getToolBadgeClassName(tool.badge))}>
+                    {tool.badge}
+                  </Badge>
+                ) : (
+                  <Star className="h-3 w-3 shrink-0 fill-amber-300 text-amber-300" />
+                )}
+              </div>
+              <p className="line-clamp-2 text-xs leading-5 text-slate-300">{tool.description}</p>
+            </Link>
+          ))}
+        </div>
+      )}
 
       {NAV_EXTERNAL_LINKS.length > 0 && (
-      <div className="mt-5 border-t border-white/10 pt-4">
-        <p className="mb-2 text-xs font-semibold text-slate-400">外部入口</p>
-        <div className="space-y-1">
-          {NAV_EXTERNAL_LINKS.map((link) => {
-            const Icon = link.icon
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-200 transition-colors hover:bg-white/10"
-              >
-                <Icon className="h-4 w-4" />
-                {link.label}
-                <ExternalLink className="ml-auto h-3 w-3 text-slate-500" />
-              </Link>
-            )
-          })}
+        <div className="mt-5 border-t border-white/10 pt-4">
+          <p className="mb-2 text-xs font-semibold text-slate-400">外部入口</p>
+          <div className="space-y-1">
+            {NAV_EXTERNAL_LINKS.map((link) => {
+              const Icon = link.icon
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-200 transition-colors hover:bg-white/10"
+                >
+                  <Icon className="h-4 w-4" />
+                  {link.label}
+                  <ExternalLink className="ml-auto h-3 w-3 text-slate-500" />
+                </Link>
+              )
+            })}
+          </div>
         </div>
-      </div>
       )}
     </aside>
   )

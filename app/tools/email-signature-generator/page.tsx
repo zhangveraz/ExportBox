@@ -84,7 +84,7 @@ export default function EmailSignatureGeneratorPage() {
                   <span className="text-[10px] text-muted-foreground">粘贴到客户端签名编辑器（源码模式）</span>
                 </CardHeader>
                 <CardContent className="px-3 pt-0 pb-3">
-                  <pre className="max-h-40 overflow-auto rounded-md border bg-white p-2 font-mono text-[10px] leading-4 text-slate-700 dark:bg-slate-950 dark:text-slate-300">{computation.html}</pre>
+                  <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-all rounded-md border bg-white p-2 font-mono text-[10px] leading-4 text-slate-700 dark:bg-slate-950 dark:text-slate-300">{computation.html}</pre>
                 </CardContent>
               </Card>
             </>

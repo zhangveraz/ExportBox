@@ -75,7 +75,7 @@ export function InvoiceForm({ form, onChange, onLineChange, onAddLine, onRemoveL
       </CardHeader>
       <CardContent className="space-y-2 px-3 pt-0 pb-3">
         {/* 发票类型 / 币种 一行，发票号 / 发票日期 一行：四个输入框等宽排成 2×2，更整齐 */}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 [&>*]:min-w-0">
           <div className="space-y-1">
             <Label htmlFor="invoiceType" className={LABEL}>发票类型</Label>
             <Select value={form.invoiceType} onValueChange={(value) => onChange({ invoiceType: value as InvoiceType })}>
@@ -132,7 +132,7 @@ export function InvoiceForm({ form, onChange, onLineChange, onAddLine, onRemoveL
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-4 [&>*]:min-w-0">
           <div className="space-y-1">
             <Label htmlFor="paymentTerms" className={LABEL}>付款条款</Label>
             <Input id="paymentTerms" list="invoice-payment-options" value={form.paymentTerms} onChange={(event) => onChange({ paymentTerms: event.target.value })} className="h-7 text-[12px]" maxLength={120} />
@@ -179,7 +179,7 @@ export function InvoiceForm({ form, onChange, onLineChange, onAddLine, onRemoveL
           ))}
         </div>
 
-        <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-4 [&>*]:min-w-0">
           <div className="space-y-1">
             <Label htmlFor="taxPercent" className={LABEL}>税率 %（外贸常为 0）</Label>
             <FormattedInput id="taxPercent" value={form.taxPercent} onChange={(value) => onChange({ taxPercent: value })} format="decimal" maxDecimals={2} className="h-7 text-[12px] font-medium" />
@@ -213,7 +213,7 @@ function PartyFields({ field, title, name, address, tel, email, onChange }: Part
   return (
     <fieldset className="space-y-1.5 rounded-md border px-2 py-1.5">
       <legend className="px-1 text-[11px] font-semibold leading-4">{title}</legend>
-      <div className="grid grid-cols-2 gap-1.5">
+      <div className="grid grid-cols-2 gap-1.5 [&>*]:min-w-0">
         <TextField id={`${field}-name`} label="公司名称" value={name} onChange={(value) => onChange({ name: value })} />
         <TextField id={`${field}-tel`} label="电话" value={tel} onChange={(value) => onChange({ tel: value })} />
       </div>

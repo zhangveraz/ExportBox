@@ -6,7 +6,7 @@
 
 import Link from 'next/link'
 import { ArrowLeftRight, ArrowRight, ArrowUpRight, Container, Sparkles } from 'lucide-react'
-import { HERO_TOOLS, HOME_STATS } from './home-data'
+import { HERO_TOOLS, HOME_STATS, HOME_TOOLS } from './home-data'
 
 /** 右侧示例卡片的行数据（纯展示，不参与计算） */
 const PREVIEW_ROWS: Array<{ label: string; value: string }> = [
@@ -44,7 +44,7 @@ export function HomeHero() {
           </h1>
 
           <p className="mt-5 max-w-xl text-sm leading-7 text-slate-600 sm:text-base sm:leading-8 dark:text-slate-300">
-            报价核算、装柜估算、费用核对、国家与时区资料，46 个外贸工具都放在一处，
+            报价核算、装柜估算、费用核对、国家与时区资料，{HOME_TOOLS.length} 个外贸工具都放在一处，
             不用在十几个标签页之间来回切换。
           </p>
 

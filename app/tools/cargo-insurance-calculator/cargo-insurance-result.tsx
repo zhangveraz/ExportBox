@@ -87,7 +87,7 @@ export function CargoInsuranceResult({ result, summaryText }: CargoInsuranceResu
           <span className="ml-auto text-[11px] font-normal text-muted-foreground group-open:hidden">展开</span>
         </summary>
         <div className="mt-2 overflow-x-auto">
-          <table className="w-full min-w-[430px] border-collapse text-[11px]">
+          <table className="w-full border-collapse text-[11px] sm:min-w-[430px]">
             <thead>
               <tr className="border-b text-left text-[10px] text-muted-foreground">
                 <th className="py-1 pr-3 font-medium">条款</th>

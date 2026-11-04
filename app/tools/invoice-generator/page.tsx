@@ -75,15 +75,18 @@ export default function InvoiceGeneratorPage() {
 
       {computation.error && <EnhancedAlert type="error" title="生成失败" message={computation.error} action={{ label: '重置为示例', onClick: () => setForm(createInvoiceFormState()) }} className="mb-2.5 print:hidden" />}
 
-      <div className="grid gap-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
-        <InvoiceForm
-          form={form}
-          onChange={(patch) => setForm((current) => ({ ...current, ...patch }))}
-          onLineChange={updateLine}
-          onAddLine={addLine}
-          onRemoveLine={removeLine}
-          onReset={() => setForm(createInvoiceFormState())}
-        />
+      {/* print:block 让打印时只剩发票纸张；左侧表单 print:hidden，避免打印出半页输入框 */}
+      <div className="grid gap-3 print:block xl:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
+        <div className="print:hidden">
+          <InvoiceForm
+            form={form}
+            onChange={(patch) => setForm((current) => ({ ...current, ...patch }))}
+            onLineChange={updateLine}
+            onAddLine={addLine}
+            onRemoveLine={removeLine}
+            onReset={() => setForm(createInvoiceFormState())}
+          />
+        </div>
         {computation.totals
           ? <InvoicePreview input={computation.input} totals={computation.totals} plainText={computation.plainText} />
           : <div className="rounded-md border border-dashed p-6 text-center text-[11px] text-muted-foreground print:hidden">修正表单后查看发票预览</div>}

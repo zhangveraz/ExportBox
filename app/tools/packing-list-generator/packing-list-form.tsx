@@ -180,7 +180,7 @@ export function PackingListForm({ form, onChange, onLineChange, onAddLine, onRem
                 </div>
 
                 {/* 数量与重量：固定三列，窄屏也不挤 */}
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   <SmallNumber id={`${line.id}-cartons`} label="箱数" value={line.cartons} onChange={(value) => onLineChange(line.id, 'cartons', value)} integer />
                   <SmallNumber id={`${line.id}-qty`} label="每箱数量" value={line.qtyPerCarton} onChange={(value) => onLineChange(line.id, 'qtyPerCarton', value)} />
                   <label htmlFor={`${line.id}-dims`} className="block min-w-0">
@@ -224,7 +224,7 @@ export function PackingListForm({ form, onChange, onLineChange, onAddLine, onRem
 
 function TextField({ id, label, value, onChange, placeholder }: { id: string; label: string; value: string; onChange: (value: string) => void; placeholder?: string }) {
   return (
-    <div className="space-y-1">
+    <div className="min-w-0 space-y-1">
       <Label htmlFor={id} className="text-[11px] text-muted-foreground">{label}</Label>
       <Input id={id} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} className="h-8 text-[13px] font-medium" maxLength={160} />
     </div>
@@ -233,7 +233,7 @@ function TextField({ id, label, value, onChange, placeholder }: { id: string; la
 
 function SmallNumber({ id, label, value, onChange, integer = false }: { id: string; label: string; value: string; onChange: (value: string) => void; integer?: boolean }) {
   return (
-    <div className="space-y-1">
+    <div className="min-w-0 space-y-1">
       <Label htmlFor={id} className="text-[11px] text-muted-foreground">{label}</Label>
       <FormattedInput id={id} value={value} onChange={onChange} format={integer ? 'number' : 'decimal'} maxDecimals={integer ? 0 : 2} className="h-8 text-[13px]" />
     </div>

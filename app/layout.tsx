@@ -11,6 +11,7 @@ import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { SearchFab } from '@/components/layout/search-fab'
 import { ThemeProvider } from '@/components/theme/theme-provider'
+import { UsageRecorder } from '@/components/tools/usage-recorder'
 import { SITE_NAME, SITE_URL } from '@/lib/site'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -77,6 +78,8 @@ export default function RootLayout({
           </div>
           {/* 全站共用的搜索悬浮球：挂在布局层，所有页面都会显示 */}
           <div className="print:hidden"><SearchFab /></div>
+          {/* 静默记录工具打开次数，用于手机端高频入口排序 */}
+          <UsageRecorder />
         </ThemeProvider>
       </body>
     </html>

@@ -20,6 +20,8 @@ const STORAGE_KEYS = [
   { key: 'currencyFavorites', usage: '货币符号页的收藏币种' },
   { key: 'worldTimeFavorites', usage: '世界时间页的收藏城市' },
   { key: 'countryFavorites', usage: '国家信息页的收藏国家' },
+  { key: 'exportbox-favorites', usage: '收藏夹里收藏的工具' },
+  { key: 'exportbox-tool-usage', usage: '各工具的打开次数，仅用于手机端「高频入口」排序' },
 ]
 
 const THIRD_PARTIES = [

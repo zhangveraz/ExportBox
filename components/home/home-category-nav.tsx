@@ -1,8 +1,8 @@
-// 名称: 首页分类导航（标签条 / 右侧悬浮竖条）
-// 描述: 点击标签平滑滚动到首页对应分类工具区；右侧竖条可上下拖动、悬停展开、自动高亮当前分类
+// 名称: 工具目录页右侧分类导航竖条
+// 描述: 右侧竖条可上下拖动、悬停展开、自动高亮当前分类（首页已改用业务流布局，不再使用标签条）
 // 路径: ExportBox/components/home/home-category-nav.tsx
 // 作者: ExportBox
-// 更新时间: 2026-10-30
+// 更新时间: 2026-11-03
 
 'use client'
 
@@ -89,63 +89,6 @@ function useActiveSection(ids: string[]) {
   }, [key])
 
   return [activeId, setActiveId] as const
-}
-
-/** 横向标签条：位于「按业务流选择工具」标题下方 */
-export function HomeCategoryChips({ items }: CategoryNavProps) {
-  const ids = useMemo(() => items.map((item) => item.id), [items])
-  const [activeId, setActiveId] = useActiveSection(ids)
-  const [atTop, setAtTop] = useState(true)
-
-  // 靠近顶部时点亮「首页」标签
-  useEffect(() => {
-    const onScroll = () => setAtTop(window.scrollY < 120)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  const pillBase =
-    'rounded-md border px-3 py-1.5 text-xs font-medium shadow-xs shadow-slate-900/2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500'
-  const pillActive =
-    'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-cyan-300/50 dark:bg-cyan-300/10 dark:text-cyan-200'
-  const pillIdle =
-    'border-slate-200 bg-white/80 text-slate-600 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 dark:border-white/10 dark:bg-slate-950/60 dark:text-slate-300 dark:hover:border-cyan-300/50 dark:hover:bg-cyan-300/10 dark:hover:text-cyan-200'
-
-  return (
-    <div className="flex flex-wrap gap-2">
-      {/* 回到顶部入口 */}
-      <a
-        href="#top"
-        onClick={(event) => {
-          event.preventDefault()
-          window.scrollTo({ top: 0, behavior: 'smooth' })
-        }}
-        aria-current={atTop ? 'true' : undefined}
-        className={`${pillBase} ${atTop ? pillActive : pillIdle}`}
-      >
-        首页
-      </a>
-      {items.map((item) => {
-        const isActive = !atTop && activeId === item.id
-        return (
-          <a
-            key={item.id}
-            href={`#${item.id}`}
-            onClick={(event) => {
-              event.preventDefault()
-              scrollToSection(item.id)
-              setActiveId(item.id)
-            }}
-            aria-current={isActive ? 'true' : undefined}
-            className={`${pillBase} ${isActive ? pillActive : pillIdle}`}
-          >
-            {item.label} · {item.count}
-          </a>
-        )
-      })}
-    </div>
-  )
 }
 
 /**

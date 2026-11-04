@@ -1,16 +1,18 @@
 // 名称: 装箱单预览组件
-// 描述: A4 版式实时预览，支持打印、复制纯文本与导出 CSV
+// 描述: A4 版式实时预览，支持打印、复制纯文本、导出 Excel 与 CSV
 // 路径: ExportBox/app/tools/packing-list-generator/packing-list-preview.tsx
 // 作者: ExportBox
-// 更新时间: 2026-10-10
+// 更新时间: 2026-11-03
 
 'use client'
 
-import { Download, Printer } from 'lucide-react'
+import { Download, FileSpreadsheet, Printer } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { EnhancedCopyButton } from '@/components/tools/enhanced-copy-button'
 import type { PackingListTotals } from '@/lib/tools/packing-list-generator'
+import { downloadXlsx } from '@/lib/tools/xlsx-export'
+import { buildPackingListWorkbook } from './packing-list-workbook'
 
 export interface PackingListPreviewProps {
   totals: PackingListTotals
@@ -37,14 +39,17 @@ export function PackingListPreview({ totals, plainText, csv, header }: PackingLi
           <Button type="button" size="sm" onClick={() => window.print()}>
             <Printer className="mr-2 h-4 w-4" />打印 / 导出 PDF
           </Button>
+          <Button type="button" variant="outline" size="sm" onClick={() => downloadXlsx(buildPackingListWorkbook(totals, header), `packing-list-${header.invoiceNo || 'export'}.xlsx`)}>
+            <FileSpreadsheet className="mr-2 h-4 w-4" />导出 Excel
+          </Button>
           <Button type="button" variant="outline" size="sm" onClick={() => downloadCsv(csv)}>
-            <Download className="mr-2 h-4 w-4" />导出 CSV（Excel）
+            <Download className="mr-2 h-4 w-4" />导出 CSV
           </Button>
         </div>
         <EnhancedCopyButton text={plainText} variant="ghost" size="sm">复制纯文本</EnhancedCopyButton>
       </div>
 
-      <div data-print-sheet className="mx-auto w-full max-w-[820px] bg-white p-8 text-slate-900 shadow-sm print:mx-0 print:max-w-none print:p-0 print:shadow-none dark:bg-slate-900 dark:text-slate-100">
+      <div data-print-sheet className="mx-auto w-full max-w-[820px] bg-white p-4 text-slate-900 shadow-sm sm:p-8 print:mx-0 print:max-w-none print:p-0 print:shadow-none dark:bg-slate-900 dark:text-slate-100">
         <div className="border-b-2 border-slate-900 pb-3 text-center dark:border-slate-100">
           <h2 className="text-2xl font-black tracking-wide">PACKING LIST</h2>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">INVOICE NO.: <span className="font-semibold text-slate-900 dark:text-slate-100">{header.invoiceNo}</span> · DATE: <span className="font-semibold text-slate-900 dark:text-slate-100">{header.date}</span></p>
@@ -70,45 +75,48 @@ export function PackingListPreview({ totals, plainText, csv, header }: PackingLi
           </div>
         </div>
 
-        <table className="mt-4 w-full border-collapse text-sm">
+        {/* 手机屏幕上 7 列表格放不下，允许在这块区域内左右滑动，避免整页被顶宽 */}
+        <div className="mt-4 overflow-x-auto print:overflow-visible">
+        <table className="w-full min-w-[330px] border-collapse text-[10px] sm:text-sm">
           <thead>
             <tr className="border border-slate-400 bg-slate-100 text-left text-xs uppercase tracking-wide dark:border-slate-500 dark:bg-slate-800">
-              <th className="border border-slate-400 px-2 py-2 dark:border-slate-500">No.</th>
-              <th className="border border-slate-400 px-2 py-2 dark:border-slate-500">Description</th>
-              <th className="border border-slate-400 px-2 py-2 text-right dark:border-slate-500">CTNS</th>
-              <th className="border border-slate-400 px-2 py-2 text-right dark:border-slate-500">Qty</th>
-              <th className="border border-slate-400 px-2 py-2 text-right dark:border-slate-500">G.W. (KG)</th>
-              <th className="border border-slate-400 px-2 py-2 text-right dark:border-slate-500">N.W. (KG)</th>
-              <th className="border border-slate-400 px-2 py-2 text-right dark:border-slate-500">CBM</th>
+              <th className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 dark:border-slate-500">No.</th>
+              <th className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 dark:border-slate-500">Description</th>
+              <th className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 text-right dark:border-slate-500">CTNS</th>
+              <th className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 text-right dark:border-slate-500">Qty</th>
+              <th className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 text-right dark:border-slate-500">G.W. (KG)</th>
+              <th className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 text-right dark:border-slate-500">N.W. (KG)</th>
+              <th className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 text-right dark:border-slate-500">CBM</th>
             </tr>
           </thead>
           <tbody>
             {totals.lines.map((line, index) => (
               <tr key={line.id} className="border border-slate-400 align-top dark:border-slate-500">
-                <td className="border border-slate-400 px-2 py-2 dark:border-slate-500">{index + 1}</td>
-                <td className="border border-slate-400 px-2 py-2 dark:border-slate-500">
+                <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 dark:border-slate-500">{index + 1}</td>
+                <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 dark:border-slate-500">
                   {line.description}
                   {line.dimensionsLabel && <span className="block text-xs text-slate-500 dark:text-slate-400">{line.dimensionsLabel} · {line.qtyPerCarton.toLocaleString('en-US')} {line.unit}/ctn</span>}
                 </td>
-                <td className="border border-slate-400 px-2 py-2 text-right tabular-nums dark:border-slate-500">{line.cartons}</td>
-                <td className="border border-slate-400 px-2 py-2 text-right tabular-nums dark:border-slate-500">{line.qtyTotal.toLocaleString('en-US')} {line.unit}</td>
-                <td className="border border-slate-400 px-2 py-2 text-right tabular-nums dark:border-slate-500">{line.gwTotal.toLocaleString('en-US', { maximumFractionDigits: 2 })}</td>
-                <td className="border border-slate-400 px-2 py-2 text-right tabular-nums dark:border-slate-500">{line.nwTotal.toLocaleString('en-US', { maximumFractionDigits: 2 })}</td>
-                <td className="border border-slate-400 px-2 py-2 text-right tabular-nums dark:border-slate-500">{line.cbm ? line.cbm.toLocaleString('en-US', { maximumFractionDigits: 4 }) : '--'}</td>
+                <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 text-right tabular-nums dark:border-slate-500">{line.cartons}</td>
+                <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 text-right tabular-nums dark:border-slate-500">{line.qtyTotal.toLocaleString('en-US')} {line.unit}</td>
+                <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 text-right tabular-nums dark:border-slate-500">{line.gwTotal.toLocaleString('en-US', { maximumFractionDigits: 2 })}</td>
+                <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 text-right tabular-nums dark:border-slate-500">{line.nwTotal.toLocaleString('en-US', { maximumFractionDigits: 2 })}</td>
+                <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 text-right tabular-nums dark:border-slate-500">{line.cbm ? line.cbm.toLocaleString('en-US', { maximumFractionDigits: 4 }) : '--'}</td>
               </tr>
             ))}
           </tbody>
           <tfoot>
             <tr className="border border-slate-900 bg-slate-100 text-sm font-bold dark:border-slate-100 dark:bg-slate-800">
-              <td className="border border-slate-400 px-2 py-2 dark:border-slate-500" colSpan={2}>TOTAL</td>
-              <td className="border border-slate-400 px-2 py-2 text-right tabular-nums dark:border-slate-500">{totals.totalCartons}</td>
-              <td className="border border-slate-400 px-2 py-2 text-right tabular-nums dark:border-slate-500">{totals.totalQty.toLocaleString('en-US')}</td>
-              <td className="border border-slate-400 px-2 py-2 text-right tabular-nums dark:border-slate-500">{totals.totalGw.toLocaleString('en-US', { maximumFractionDigits: 2 })}</td>
-              <td className="border border-slate-400 px-2 py-2 text-right tabular-nums dark:border-slate-500">{totals.totalNw.toLocaleString('en-US', { maximumFractionDigits: 2 })}</td>
-              <td className="border border-slate-400 px-2 py-2 text-right tabular-nums dark:border-slate-500">{totals.totalCbm.toLocaleString('en-US', { maximumFractionDigits: 4 })}</td>
+              <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 dark:border-slate-500" colSpan={2}>TOTAL</td>
+              <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 text-right tabular-nums dark:border-slate-500">{totals.totalCartons}</td>
+              <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 text-right tabular-nums dark:border-slate-500">{totals.totalQty.toLocaleString('en-US')}</td>
+              <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 text-right tabular-nums dark:border-slate-500">{totals.totalGw.toLocaleString('en-US', { maximumFractionDigits: 2 })}</td>
+              <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 text-right tabular-nums dark:border-slate-500">{totals.totalNw.toLocaleString('en-US', { maximumFractionDigits: 2 })}</td>
+              <td className="border border-slate-400 px-1 py-1 sm:px-2 sm:py-2 text-right tabular-nums dark:border-slate-500">{totals.totalCbm.toLocaleString('en-US', { maximumFractionDigits: 4 })}</td>
             </tr>
           </tfoot>
         </table>
+        </div>
 
         {header.marks && (
           <div className="mt-4 border border-slate-300 p-3 text-xs dark:border-slate-600">
